@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SWF Loader</title>
+  <!-- Use your self-hosted Ruffle -->
+  <script src="ruffle.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #1e1e2f;
+      color: #fff;
+    }
+    #dropzone {
+      border: 2px dashed #aaa;
+      border-radius: 12px;
+      padding: 40px;
+      width: 400px;
+      margin: 50px auto;
+      cursor: pointer;
+      background: #2c2c3c;
+    }
+    #dropzone:hover {
+      background: #3c3c4c;
+    }
+    #player {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Drop or Select a SWF</h1>
+  <div id="dropzone">Drag & drop a SWF here<br>or click to choose</div>
+  <div id="player"></div>
+
+  <script>
+    const dropzone = document.getElementById("dropzone");
+    const playerDiv = document.getElementById("player");
+
+    dropzone.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".swf";
+      input.onchange = () => loadSWF(input.files[0]);
+      input.click();
+    });
+
+    dropzone.addEventListener("dragover", e => {
+      e.preventDefault();
+      dropzone.style.background = "#444";
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.style.background = "#2c2c3c";
+    });
+
+    dropzone.addEventListener("drop", e => {
+      e.preventDefault();
+      dropzone.style.background = "#2c2c3c";
+      const file = e.dataTransfer.files[0];
+      if (file && file.name.endsWith(".swf")) {
+        loadSWF(file);
+      } else {
+        alert("Please drop a .swf file");
+      }
+    });
+
+    function loadSWF(file) {
+      const url = URL.createObjectURL(file);
+
+      playerDiv.innerHTML = "";
+      if (!window.RufflePlayer) {
+        alert("Ruffle failed to load!");
+        return;
+      }
+
+      const ruffle = window.RufflePlayer.newest();
+      const player = ruffle.createPlayer();
+      player.style.width = "800px";
+      player.style.height = "600px";
+
+      playerDiv.appendChild(player);
+      player.load({ url });
+    }
+  </script>
+</body>
+</html>
